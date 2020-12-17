@@ -1,0 +1,1 @@
+INSERT INTO apartments (title, tenantId, location, capacity) VALUES ('Stanovanje 1', 1,1,4);
