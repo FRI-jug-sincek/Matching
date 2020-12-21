@@ -1,4 +1,4 @@
-package si.fri.rso.samples.apartments.api.v1.dtos;
+package si.fri.rso.samples.matching.api.v1.dtos;
 
 public class ApiError {
 

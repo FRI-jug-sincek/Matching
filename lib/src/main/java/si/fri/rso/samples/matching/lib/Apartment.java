@@ -1,10 +1,10 @@
-package si.fri.rso.samples.apartments.lib;
+package si.fri.rso.samples.matching.lib;
 
 public class Apartment {
 
     private int Id;
     private String title;
-    private String tenantId;
+    private int tenantId;
     private String location;
     private int capacity;
 
@@ -24,11 +24,11 @@ public class Apartment {
         this.title = title;
     }
 
-    public String getTenantId() {
+    public int getTenantId() {
         return tenantId;
     }
 
-    public void setTenantId(String tenantId) {
+    public void setTenantId(int tenantId) {
         this.tenantId = tenantId;
     }
 

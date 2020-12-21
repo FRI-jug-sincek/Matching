@@ -1,4 +1,4 @@
-package si.fri.rso.samples.apartments.models.converters;
+package si.fri.rso.samples.matching.models.converters;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

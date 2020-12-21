@@ -1,15 +1,15 @@
 kumuluzee:
-  name: apartments-service
+  name: matching-service
   env:
     name: dev
   version: 1.0.0
   server:
-    base-url: http://localhost:8080
+    base-url: http://localhost:8081
     http:
-      port: 8080
+      port: 8081
   datasources:
-    - jndi-name: jdbc/ApartmentDS
-      connection-url: jdbc:postgresql://localhost:5432/apartments
+    - jndi-name: jdbc/MatchingDS
+      connection-url: jdbc:postgresql://localhost:5432/matching
       username: dbuser
       password: postgres
       max-pool-size: 20
