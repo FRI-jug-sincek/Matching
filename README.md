@@ -21,4 +21,3 @@ docker run -d --name users -e POSTGRES_USER=dbuser -e POSTGRES_PASSWORD=postgres
 ```
 
 geslo za povezavo na elephantdb bazo je treba ročno nastavit v k8s configuraciji dokler ne uspostavimo secretov.
-
