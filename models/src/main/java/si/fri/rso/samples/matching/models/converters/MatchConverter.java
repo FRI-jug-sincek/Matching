@@ -31,4 +31,18 @@ public class MatchConverter {
         return e;
     }
 
+    public static String toString(Match m) {
+
+        String s = "";
+
+        s = s + "id:" + m.getId() + " ; ";
+        s = s + "apartmentId:" + m.getApartmentId() + " ; ";
+        s = s + "userId:" + m.getUserId() + " ; ";
+        s = s + "location:" + m.getLocation() + " ; ";
+        s = s + "initiator:" + m.getInitiator() + " ; ";
+        s = s + "mutual:" + m.getMutual();
+
+        return s;
+    }
+
 }

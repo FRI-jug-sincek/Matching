@@ -33,7 +33,7 @@ public class MatchBean {
         ArrayList<Integer> apartmentsForRecommendation = new ArrayList<>();
 
         // find all the matches that have the same userId as the user from the request
-        List<Match> matchesByUser = getMatchesFilterString("filter=userID:eq:" + u.getUserId());
+        List<Match> matchesByUser = getMatchesFilterString("filter=userId:eq:" + u.getUserId());
 
         ArrayList<Integer> knownApartmentIdsUnique = new ArrayList<>();
 
@@ -53,14 +53,16 @@ public class MatchBean {
             }
         }
 
+        log.info("Searching for apartments in location " + u.getLocation());
+
         //get apartments from the users location
         String jsonResponse = null;
         try {
-            jsonResponse = Unirest.get("localhost:8080/v1/apartments/filtered?filter=location:EQ:{location}")
+            jsonResponse = Unirest.get("http://localhost:8080/v1/apartments/filtered?filter=location:EQ:{location}")
                             .routeParam("location", u.getLocation())
                             .asString().getBody();
         } catch (Exception ex) {
-            log.info("Error making a GET request.");
+            log.info("Error making a GET request - " + ex.getMessage());
             return apartmentsForRecommendation;
         }
 
@@ -81,6 +83,8 @@ public class MatchBean {
                 break;
             }
 
+            log.info("ResponseElement: " + el.toString());
+
             if(!knownApartmentIdsUnique.contains(el.getAsJsonObject().get("id").getAsInt())) {
                 apartmentsForRecommendation.add(el.getAsJsonObject().get("id").getAsInt());
             }
@@ -93,7 +97,7 @@ public class MatchBean {
         ArrayList<Integer> usersForRecommendation = new ArrayList<>();
 
         // find all the matches that have the same apartmentId as the apartment from the request
-        List<Match> matchesByApartment = getMatchesFilterString("filter=apartmentID:eq:" + a.getId());
+        List<Match> matchesByApartment = getMatchesFilterString("filter=apartmentId:eq:" + a.getId());
 
         ArrayList<Integer> knownUserIdsUnique = new ArrayList<>();
 
@@ -113,14 +117,16 @@ public class MatchBean {
             }
         }
 
+        log.info("Searching for users in location " + a.getLocation());
+
         //get apartments from the users location
         String jsonResponse = null;
         try {
-            jsonResponse = Unirest.get("localhost:8082/v1/users/filtered?filter=location:EQ:{location}")
+            jsonResponse = Unirest.get("http://localhost:8082/v1/users/filtered?filter=location:EQ:{location}")
                     .routeParam("location", a.getLocation())
                     .asString().getBody();
         } catch (Exception ex) {
-            log.info("Error making a GET request.");
+            log.info("Error making a GET request - " + ex.getMessage());
             return usersForRecommendation;
         }
 
@@ -141,8 +147,10 @@ public class MatchBean {
                 break;
             }
 
-            if(!knownUserIdsUnique.contains(el.getAsJsonObject().get("id").getAsInt())) {
-                usersForRecommendation.add(el.getAsJsonObject().get("id").getAsInt());
+            log.info("ResponseElement: " + el.toString());
+
+            if(!knownUserIdsUnique.contains(el.getAsJsonObject().get("userId").getAsInt())) {
+                usersForRecommendation.add(el.getAsJsonObject().get("userId").getAsInt());
             }
         }
 
@@ -150,6 +158,8 @@ public class MatchBean {
     }
 
     public Match match(Match m1) {
+
+        log.info("Try to match: " + MatchConverter.toString(m1));
 
         //find all the previous matches wih this user
         String queryString = "filter=" +
@@ -164,8 +174,10 @@ public class MatchBean {
         } else {
             boolean changed = false;
             for (Match m2 : ms) {
+                log.info("Compare with match: " + MatchConverter.toString(m2));
                 //if for some reason we already had a mutual match the one party said no do nothing
                 if(m2.getMutual().equals("YES") || m2.getMutual().equals("NO")) {
+                    System.out.println("00");
                     return null;
                 }
                 //the new match is of the opposite initiation but the mutuality is NO
@@ -177,20 +189,23 @@ public class MatchBean {
                     temp.setLocation(m2.getLocation());
                     temp.setMutual("NO");
                     temp.setInitiator(m2.getInitiator());
+                    System.out.println("11");
                     break;
                 }
                 //the new match is of the opposite initiation and is mutual
                 //this means we should update the old TBD with YES
-                if(!m1.getInitiator().equals(m2.getInitiator()) && m1.getMutual().equals("YES")) {
+                if(!m1.getInitiator().equals(m2.getInitiator()) && m1.getMutual().equals("TBD")) {
                     changed = true;
                     temp.setUserId(m2.getUserId());
                     temp.setApartmentId(m2.getApartmentId());
                     temp.setLocation(m2.getLocation());
                     temp.setMutual("YES");
                     temp.setInitiator(m2.getInitiator());
+                    System.out.println("22");
                     break;
                 }
             }
+            System.out.println(changed);
             //we have a match pair
             if(changed) {
                 //we remove all the old useless matches
@@ -210,7 +225,7 @@ public class MatchBean {
         QueryParameters queryParameters = QueryParameters.query(uriInfo.getRequestUri().getQuery()).defaultOffset(0)
                 .build();
 
-        System.out.println("lmao " + uriInfo.getRequestUri().getQuery());
+        System.out.println("Search for: " + uriInfo.getRequestUri().getQuery());
 
         return JPAUtils.queryEntities(em, MatchEntity.class, queryParameters).stream()
                 .map(MatchConverter::toDto).collect(Collectors.toList());
@@ -220,7 +235,7 @@ public class MatchBean {
 
         QueryParameters queryParameters = QueryParameters.query(queryString).defaultOffset(0).build();
 
-        System.out.println("lmaoString " + queryString);
+        System.out.println("Search for: " + queryString);
 
         return JPAUtils.queryEntities(em, MatchEntity.class, queryParameters).stream()
                 .map(MatchConverter::toDto).collect(Collectors.toList());
