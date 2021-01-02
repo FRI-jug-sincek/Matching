@@ -2,9 +2,9 @@ name: Build with Maven and make docker image
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -35,4 +35,4 @@ jobs:
         with:
           file: ./Dockerfile_with_maven_build
           push: true
-          tags: frijugsincek/apartments:${{ steps.time.outputs.time }}
+          tags: frijugsincek/matching:${{ steps.time.outputs.time }}
