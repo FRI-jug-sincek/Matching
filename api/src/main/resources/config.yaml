@@ -12,7 +12,8 @@ kumuluzee:
       connection-url: jdbc:postgresql://localhost:5432/matching
       username: dbuser
       password: postgres
-      max-pool-size: 20
+      pool:
+        max-size: 3
   cors-filter:
     servlet:
       allow-origin: "*"
