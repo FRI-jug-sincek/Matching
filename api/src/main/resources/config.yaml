@@ -13,6 +13,11 @@ kumuluzee:
       username: dbuser
       password: postgres
       max-pool-size: 20
+  cors-filter:
+    servlet:
+      allow-origin: "*"
+      allow-subdomains: true
+      supported-methods: "GET, POST, DELETE, HEAD, OPTIONS, PUT"
   logs:
     config-file: '<?xml version="1.0" encoding="UTF-8"?>
                           <Configuration name="comments">
