@@ -61,7 +61,7 @@ public class MatchBean {
             // jsonResponse = Unirest.get("http://localhost:8080/v1/apartments/filtered?filter=location:EQ:{location}")
             //                 .routeParam("location", u.getLocation())
             //                 .asString().getBody();
-            jsonResponse = Unirest.get("http://apartments/v1/apartments/filtered?filter=location:EQ:{location}")
+            jsonResponse = Unirest.get("http://40.76.169.130/apartments/v1/apartments/filtered?filter=location:EQ:{location}")
                             .routeParam("location", u.getLocation())
                             .asString().getBody();
         } catch (Exception ex) {
@@ -128,7 +128,7 @@ public class MatchBean {
             // jsonResponse = Unirest.get("http://localhost:8082/v1/users/filtered?filter=location:EQ:{location}")
             //         .routeParam("location", a.getLocation())
             //         .asString().getBody();
-            jsonResponse = Unirest.get("http://users/v1/users/filtered?filter=location:EQ:{location}")
+            jsonResponse = Unirest.get("http://40.76.169.130/users/v1/users/filtered?filter=location:EQ:{location}")
                     .routeParam("location", a.getLocation())
                     .asString().getBody();
         } catch (Exception ex) {
