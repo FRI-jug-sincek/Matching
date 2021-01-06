@@ -5,8 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+import kong.unirest.json.JSONObject;
+import org.graalvm.compiler.debug.CSVUtil;
 import si.fri.rso.samples.matching.lib.Apartment;
+import si.fri.rso.samples.matching.lib.MailParameters;
 import si.fri.rso.samples.matching.lib.Match;
 import si.fri.rso.samples.matching.lib.User;
 import si.fri.rso.samples.matching.models.converters.MatchConverter;
@@ -218,8 +222,104 @@ public class MatchBean {
                 for (Match m2 : ms) {
                     deleteMatch(m2.getId());
                 }
+
+                String usrName = "";
+                String usrEmail = "";
+                String aptName = "";
+                String aptEmail = "";
+
+                //get corresponding usr
+                String jsonResponse = null;
+                try {
+                     jsonResponse = Unirest.get("http://localhost:8082/v1/users/filtered?filter=id:EQ:{userId}")
+                                     .routeParam("userId", "" + temp.getUserId())
+                                     .asString().getBody();
+                    System.out.println("usr-response-json: " + jsonResponse);
+                } catch (Exception ex) {
+                    log.info("Error making a GET request - " + ex.getMessage());
+                }
+
+                JsonArray responseArray = null;
+
+                try {
+                    JsonParser parser = new JsonParser();
+                    JsonElement tmp = parser.parse(jsonResponse);
+                    responseArray = tmp.getAsJsonArray();
+
+                    for (JsonElement el : responseArray) {
+                        usrName = el.getAsJsonObject().get("name").getAsString();
+                        usrEmail = el.getAsJsonObject().get("email").getAsString();
+                    }
+                } catch (Exception ex) {
+                    log.info("Error when decoding: " + ex.getMessage());
+                }
+
+                //get corresponding apartment
+                jsonResponse = null;
+                try {
+                    jsonResponse = Unirest.get("http://localhost:8080/v1/apartments/filtered?filter=id:EQ:{id}")
+                             .routeParam("id", temp.getApartmentId() + "")
+                             .asString().getBody();
+                    System.out.println("apt-response-json: " + jsonResponse);
+                } catch (Exception ex) {
+                    log.info("Error making a GET request - " + ex.getMessage());
+                }
+
+                responseArray = null;
+
+                try {
+                    JsonParser parser = new JsonParser();
+                    JsonElement tmp = parser.parse(jsonResponse);
+                    responseArray = tmp.getAsJsonArray();
+
+                    for (JsonElement el : responseArray) {
+                        aptName = el.getAsJsonObject().get("title").getAsString();
+                        aptEmail = el.getAsJsonObject().get("email").getAsString();
+                    }
+                } catch (Exception ex) {
+                    log.info("Error when decoding: " + ex.getMessage());
+                }
+
+                //call service for emailing the user and the apartment
+                MailParameters mp = new MailParameters();
+
+                //sender
+                mp.setsEmail("ms9922@student.uni-lj.si");
+                mp.setsName("Cimber team");
+
+                mp.setSubject("New match!");
+
+                //recepient = user
+                log.info("Sending mail for successful match to user " + usrEmail + " :)");
+                mp.seteEmail(usrEmail);
+                mp.seteName(usrName);
+                mp.setMessage("<h3>You have a new match with apartment " + aptName + "</h3><br /> " +
+                        "<h3>You can contact the apartment on this <a href=\"https://en.wikipedia.org/wiki/Cloud_computing\">link</a>." +
+                        "</h3><br /> Stay safe<br /> - Cimber team");
+
+                try {
+                    sendMail(mp);
+                } catch (Exception ex) {
+                    log.info("Error when trying to send mail: " + ex.getMessage());
+                }
+
+                log.info("Sending mail for successful match to apartment " + aptEmail);
+                //recepient = apartment
+                mp.seteEmail(aptEmail);
+                mp.seteName(aptName);
+                mp.setMessage("<h3>You have a new match with user " + usrName + "</h3><br /> " +
+                        "<h3>You can contact the user on this <a href=\"https://en.wikipedia.org/wiki/Cloud_computing\">link</a>." +
+                        "</h3><br /> Stay safe<br /> - Cimber team");
+
+                try {
+                    sendMail(mp);
+                } catch (Exception ex) {
+                    log.info("Error when trying to send mail: " + ex.getMessage() + " :)");
+                }
+
                 //we create a new one from the pair
                 return createMatch(temp);
+
             } else {
                 return null;
             }
@@ -282,6 +382,33 @@ public class MatchBean {
             }
         }
         else {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean sendMail(MailParameters mp) {
+
+        try {
+            String input = new JSONObject()
+                    .put("eEmail", mp.geteEmail())
+                    .put("eName", mp.geteName())
+                    .put("message", mp.getMessage())
+                    .put("sEmail", mp.getsEmail())
+                    .put("sName", mp.getsName())
+                    .put("subject", mp.getSubject())
+                    .toString();
+
+            System.out.println(input);
+
+            HttpResponse<String> response = Unirest.post("http://localhost:8083/v1/mailing/send")
+                    .header("content-type", "application/json")
+                    .body(input)
+                    .asString();
+
+        } catch (Exception ex) {
+            log.info("Error making a GET request - " + ex.getMessage() + "end getmessage");
             return false;
         }
 

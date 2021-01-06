@@ -7,6 +7,7 @@ public class User {
     private Integer userId;
     private String name;
     private String surname;
+    private String email;
     private String location;
     private Integer age;
     private Instant created;
@@ -29,6 +30,14 @@ public class User {
 
     public String getSurname() {
         return surname;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setSurname(String surname) {

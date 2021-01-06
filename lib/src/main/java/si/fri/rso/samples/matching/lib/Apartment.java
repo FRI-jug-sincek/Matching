@@ -4,6 +4,8 @@ public class Apartment {
 
     private int Id;
     private String title;
+    private String description;
+    private String email;
     private int tenantId;
     private String location;
     private int capacity;
@@ -22,6 +24,22 @@ public class Apartment {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public int getTenantId() {
