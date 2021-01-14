@@ -9,9 +9,9 @@ kumuluzee:
       port: 8080
   datasources:
     - jndi-name: jdbc/MatchingDS
-      connection-url: jdbc:postgresql://localhost:5432/matching
-      username: dbuser
-      password: postgres
+      connection-url: jdbc:postgresql://suleiman.db.elephantsql.com:5432/bidrgpur
+      username: bidrgpur
+      password: c1z2u5wSNOcGP-cmG4Apd6x54fq7Dfwr
       pool:
         max-size: 3
   cors-filter:
