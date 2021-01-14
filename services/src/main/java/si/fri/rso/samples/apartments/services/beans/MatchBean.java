@@ -8,6 +8,9 @@ import com.kumuluz.ee.rest.utils.JPAUtils;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.json.JSONObject;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.graalvm.compiler.debug.CSVUtil;
 import si.fri.rso.samples.matching.lib.Apartment;
 import si.fri.rso.samples.matching.lib.MailParameters;
@@ -18,7 +21,9 @@ import si.fri.rso.samples.matching.models.entities.MatchEntity;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.UriInfo;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -125,14 +130,22 @@ public class MatchBean {
 
         //get apartments from the users location
         String jsonResponse = null;
-        try {
-            jsonResponse = Unirest.get("http://40.76.169.130/users/v1/users/filtered?filter=location:EQ:{location}")
-                    .routeParam("location", a.getLocation())
-                    .asString().getBody();
+
+        /*try {
+             jsonResponse = Unirest.get("http://localhost:8082/v1/users/filtered?filter=location:EQ:{location}")
+                     .routeParam("location", a.getLocation())
+                     .asString().getBody();
+            //jsonResponse = Unirest.get("http://40.76.169.130/users/v1/users/filtered?filter=location:EQ:{location}")
+              //      .routeParam("location", a.getLocation())
+              //      .asString().getBody();
+
         } catch (Exception ex) {
             log.info("Error making a GET request - " + ex.getMessage());
             return usersForRecommendation;
-        }
+        }*/
+
+        jsonResponse = getUsersByLocation(a.getLocation());
+        if (jsonResponse == null) return usersForRecommendation;
 
         JsonArray responseArray = null;
 
@@ -159,6 +172,27 @@ public class MatchBean {
         }
 
         return usersForRecommendation;
+    }
+
+    @Timeout(value = 2, unit = ChronoUnit.SECONDS)
+    @CircuitBreaker(requestVolumeThreshold = 3)
+    @Fallback(fallbackMethod = "fallBackMethod")
+    public String getUsersByLocation(String location) {
+        String jsonResponse = null;
+
+        try {
+            jsonResponse = Unirest.get("http://40.76.169.130/users/v1/users/filtered?filter=location:EQ:{location}")
+                    .routeParam("location", location)
+                    .asString().getBody();
+        } catch (Exception ex) {
+            log.info("Error making a GET request - " + ex.getMessage());
+            throw new InternalServerErrorException(ex);
+        }
+        return jsonResponse;
+    }
+
+    public String fallBackMethod(String location) {
+        return null;
     }
 
     public Match match(Match m1) {
