@@ -13,7 +13,7 @@ spec:
         app: matching
     spec:
       containers:
-        - image: frijugsincek/matching:2021-01-08-00-20-18
+        - image: frijugsincek/matching:2021-01-14-21-18-00
           name: matching
           env:
             - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
