@@ -67,9 +67,6 @@ public class MatchBean {
         //get apartments from the users location
         String jsonResponse = null;
         try {
-            // jsonResponse = Unirest.get("http://localhost:8080/v1/apartments/filtered?filter=location:EQ:{location}")
-            //                 .routeParam("location", u.getLocation())
-            //                 .asString().getBody();
             jsonResponse = Unirest.get("http://40.76.169.130/apartments/v1/apartments/filtered?filter=location:EQ:{location}")
                             .routeParam("location", u.getLocation())
                             .asString().getBody();
@@ -133,6 +130,7 @@ public class MatchBean {
 
         //get apartments from the users location
         String jsonResponse = null;
+
         /*try {
              jsonResponse = Unirest.get("http://localhost:8082/v1/users/filtered?filter=location:EQ:{location}")
                      .routeParam("location", a.getLocation())
@@ -140,6 +138,7 @@ public class MatchBean {
             //jsonResponse = Unirest.get("http://40.76.169.130/users/v1/users/filtered?filter=location:EQ:{location}")
               //      .routeParam("location", a.getLocation())
               //      .asString().getBody();
+
         } catch (Exception ex) {
             log.info("Error making a GET request - " + ex.getMessage());
             return usersForRecommendation;
@@ -260,7 +259,7 @@ public class MatchBean {
                 //get corresponding usr
                 String jsonResponse = null;
                 try {
-                     jsonResponse = Unirest.get("http://localhost:8082/v1/users/filtered?filter=id:EQ:{userId}")
+                     jsonResponse = Unirest.get("http://40.76.169.130/users/v1/users/filtered?filter=id:EQ:{userId}")
                                      .routeParam("userId", "" + temp.getUserId())
                                      .asString().getBody();
                     System.out.println("usr-response-json: " + jsonResponse);
@@ -286,7 +285,7 @@ public class MatchBean {
                 //get corresponding apartment
                 jsonResponse = null;
                 try {
-                    jsonResponse = Unirest.get("http://localhost:8080/v1/apartments/filtered?filter=id:EQ:{id}")
+                    jsonResponse = Unirest.get("http://40.76.169.130/apartments/v1/apartments/filtered?filter=id:EQ:{id}")
                              .routeParam("id", temp.getApartmentId() + "")
                              .asString().getBody();
                     System.out.println("apt-response-json: " + jsonResponse);
@@ -431,7 +430,7 @@ public class MatchBean {
 
             System.out.println(input);
 
-            HttpResponse<String> response = Unirest.post("http://localhost:8083/v1/mailing/send")
+            HttpResponse<String> response = Unirest.post("http://40.76.169.130/mailing/v1/mailing/send")
                     .header("content-type", "application/json")
                     .body(input)
                     .asString();
